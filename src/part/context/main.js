@@ -25,6 +25,7 @@ class Context
         this.root = document.createElement("div");
 
         this.root.classList.add("context-root");
+        this.root.classList.add("context");
 
         this.root.style.position = "fixed";
         this.root.style.width = "200px";
@@ -34,6 +35,7 @@ class Context
         this.shadow = document.createElement("div");
 
         this.shadow.classList.add("context-shadow");
+        this.shadow.classList.add("context");
 
         this.shadow.style.position = "fixed";
         this.shadow.style.width = "200px";
@@ -89,6 +91,8 @@ class Context
             {
                 let b = document.createElement("button");
                 b.innerHTML = key;
+                b.classList.add("context-button");
+                b.classList.add("context");
 
                 b.style.display = "block";
                 b.style.width = "100%";
@@ -263,6 +267,7 @@ class MouseContext extends Context
         this.blob.style.height = "10px";
         this.blob.style.backgroundColor = "#ff0000";
         this.blob.style.borderRadius = "5px";
+        this.blob.style.pointerEvents = "none";
 
         body.appendChild(this.blob)
     }
@@ -388,16 +393,20 @@ function setup(app, container)
 
     app.event.addEventListener("afterload", loadPermanentContent);
     app.event.addEventListener("raisecontext", loadContext);
-    app.event.addEventListener("click", function()
-    {
-        if(mouse_context !== null)
-        {
-            mouse_context.destroy();
-        }
-        permanent_context.destroy();
-    });
-
     window.addEventListener("resize", handleWindowResize);
+    window.addEventListener("click", function(ev)
+    {
+        let target = ev.target;
+
+        if(!target.classList.contains("context"))
+        {
+            if(mouse_context !== null)
+            {
+                mouse_context.destroy();
+            }
+            permanent_context.destroy();
+        }
+    })
 }
 
 export {setup};
