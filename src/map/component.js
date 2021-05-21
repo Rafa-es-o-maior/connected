@@ -14,66 +14,57 @@ function rotate(x, y, originX, originY, rotation)
     return {x:rotatedX + originX, y: rotatedY + originY};
 }
 
+class ComponentBuilder
+{
+    constructor(name)
+    {
+        this.name = name;
+    }
+
+    build(component)
+    {
+
+    }
+
+    evaluate(component)
+    {
+        
+    }
+
+    create(world, x, y)
+    {
+        return Component.from_builder(world, x, y, this);
+    }
+}
+
 class Component
 {
-    constructor(world, x, y, layout)
+    constructor(world, x, y)
     {
-        this.layout = layout || this.getLayout();
         this.rotation = Rotation.NORMAL;
 
         this.world = world;
         this.x = x;
         this.y = y;
 
-        this.#buildLayout();
-    }
-
-    #buildLayout()
-    {
-        this.width = this.layout.width;
-        this.height = this.layout.height;
+        this.width = 0;
+        this.height = 0;
 
         this.interactors = {};
-
-        for(let i = 0; i < this.layout.interactors.length; i++)
-        {
-            let component_declare = this.layout.interactors[i];
-            this.interactors[component_declare.name] = this.#fromDeclaration(component_declare);
-        }
+        this.builder = null;
     }
 
-    #fromDeclaration(declared)
+    static from_builder(world, x, y, builder)
     {
-        return new declared.interactor(this, declared.x, declared.y);
+        let component = new this(world, x, y);
+        component.builder = builder;
+        builder.build(component);
+        return component;
     }
 
-    rebuildLayout()
+    addInteractor(klass, name, x, y)
     {
-        this.width = this.layout.width;
-        this.height = this.layout.height;
-
-        let names = Object.keys(this.layout.interactors);
-
-        for(let i = 0; i < this.layout.interactors.length; i++)
-        {
-            let component_declare = this.layout.interactors[i];
-            if(this.interactors[component_declare.name] === undefined)
-            {
-                this.interactors[component_declare.name] = this.#fromDeclaration(component_declare);
-            }
-            else
-            {
-                let interactor = this.interactors[component_declare.name];
-                interactor.relativeX = component_declare.x;
-                interactor.relativeY = component_declare.y;
-                names.splice(names.indexOf(component_declare.name), 1);
-            }
-        }
-
-        for(let i = 0; i < names.length; i++)
-        {
-            this.layout.interactors[names[i]] = undefined;
-        }
+        this.interactors[name] = new klass(this, x, y);
     }
 
     get rotatedSize()
@@ -81,11 +72,6 @@ class Component
         let pos = rotate(this.width, this.height, 0, 0, this.rotation);
 
         return {x: Math.abs(Math.round(pos.x)), y: Math.abs(Math.round(pos.y))};
-    }
-
-    getLayout()
-    {
-        throw new Error("Not Implemented");
     }
 
     prepareRun()
@@ -96,35 +82,15 @@ class Component
         }
     }
 
-    evaluate()
-    {
-        throw new Error("Not Implemented")
-    }
-
     invalidate()
     {
         this.world.queuedComponents.add(this);
     }
 }
 
-class Layout
-{
-    constructor(width, height, interactors)
-    {
-        this.width = width;
-        this.height = height;
-        this.interactors = interactors;
-    }
-}
-
 class Interactor
 {
     static color = new Color(0, 0, 0);
-
-    static positioned(name, x, y)
-    {
-        return {interactor: this, name, x, y};
-    }
 
     constructor(owner, x, y)
     {
@@ -195,10 +161,13 @@ class Listener extends Interactor
 
 class Emitter extends Interactor
 {
+    #internal;
+
     static color = new Color(0, 0, 255);
 
     prepareRun()
     {
+        this.#internal = false;
         super.prepareRun();
     }
 
@@ -215,6 +184,13 @@ class Emitter extends Interactor
                 this.system.deactivate(this);
             }
         }
+
+        this.#internal = newstate;
+    }
+
+    get state()
+    {
+        return this.#internal;
     }
 }
 
@@ -225,5 +201,5 @@ const Rotation = {
     ANTICLOCKWISE: Math.PI * 1.5
 }
 
-export default Component;
-export {Rotation, Interactor, Layout, Listener, Emitter};
+export default ComponentBuilder;
+export {Rotation, Interactor, Listener, Emitter};

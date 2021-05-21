@@ -2,18 +2,18 @@ function setup(app, container)
 {
     let registry = [];
 
-    function setToolComponent(klass)
+    function setToolComponent(builder)
     {
-        app.tools.setPlacementTool(new app.component.tool.ComponentTool(app, new klass(app.world.loadedWorld)))
+        app.tools.setPlacementTool(new app.component.tool.ComponentTool(app, builder.create(app.world.loadedWorld)))
     }
 
-    container.registerComponent = function(name, klass)
+    container.registerComponent = function(name, builder)
     {
-        registry[name] = klass;
+        registry[name] = builder;
 
         app.context.mergeGlobalContext({
             components: {
-                [klass.name || name]: setToolComponent.bind(null, klass)
+                [builder.name]: setToolComponent.bind(null, builder)
             }
         })
     }
@@ -53,6 +53,19 @@ function setup(app, container)
             app.ctx.fillStyle = interactor.constructor.color;
             let interactor_screen = app.world.math.positionToScreen(pos.x + centre, pos.y + centre);
             app.ctx.fillRect(interactor_screen.x - 10, interactor_screen.y - 10, 20, 20);
+
+            if(component.world.running)
+            {
+                app.ctx.fillStyle = interactor.state ? "#00ff00": "#ff0000";
+                app.ctx.strokeStyle = "#000000";
+                app.ctx.lineWidth = 1;
+
+                app.ctx.fillRect(interactor_screen.x - 5, interactor_screen.y - 5, 10, 10);
+
+                app.ctx.beginPath();
+                app.ctx.rect(interactor_screen.x - 5, interactor_screen.y - 5, 10, 10);
+                app.ctx.stroke();
+            }
         }
     }
 

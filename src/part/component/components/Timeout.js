@@ -1,39 +1,30 @@
-import Component from "../../../../map/component.js";
-import { Layout, Listener, Emitter } from "../../../../map/component.js";
+import ComponentBuilder from "../../../../map/component.js";
+import { Listener, Emitter } from "../../../../map/component.js";
 
-class Timeout extends Component
+class Timeout extends ComponentBuilder
 {
-    static name = "Timeout Gate"
-
-    constructor(world, x, y, layout)
+    build(component)
     {
-        super(world, x, y, layout);
-        this.thread = null;
-    }
-
-    getLayout()
-    {
-        return new Layout(2, 1, [Listener.positioned("input", 0, 0),
-        Emitter.positioned("output", 1, 0)])
+        component.width = 2;
+        component.height = 1;
+        component.addInteractor(Listener, "input", 0, 0);
+        component.addInteractor(Emitter, "output", 1, 0);
     }
 
 
-    evaluate()
+    evaluate(component)
     {
-        let setting = this.interactors.input.state;
+        let setting = component.interactors.input.state;
 
         setTimeout(()=>{
-            this.interactors.output.setState(setting);
-            this.invalidate();
+            component.interactors.output.setState(setting);
         }, 1000);
-
-        return true;
     }
 }
 
 function setup(app, container)
 {
-    app.component.registerComponent("builtin:timeoutgate", Timeout);
+    app.component.registerComponent("builtin:timeoutgate", new Timeout("Timeout Gate"));
 }
 
 export {setup};

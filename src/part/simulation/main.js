@@ -40,7 +40,7 @@ function setup(app, container)
                 if(component.x <= pos.x && component.x + rotatedSize.x > pos.x &&
                     component.y <= pos.y && component.y + rotatedSize.y > pos.y)
                 {
-                    if(typeof component.click === "function") component.click();
+                    component.builder.click(component);
                 }
             }
 

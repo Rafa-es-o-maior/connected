@@ -48,10 +48,8 @@ class World
     #tickComponents()
     {
         for(let component of this.queuedComponents){
-            if(component.evaluate())
-            {
-                this.queuedComponents.delete(component);
-            }
+            this.queuedComponents.delete(component);
+            component.builder.evaluate(component);
         }
     }
 

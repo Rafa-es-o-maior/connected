@@ -149,8 +149,8 @@ class Context
         this.x = this.initX + pos.x;
         this.y = this.initY + pos.y;
         
-        this.root.style.transition = "top 0.2s, left 0.2s";
-        this.shadow.style.transition = "top 0.2s, left 0.2s";
+        this.root.style.transition = "top 0.5s cubic-bezier(.18,.89,.32,1.28), left 0.5s cubic-bezier(.18,.89,.32,1.28)";
+        this.shadow.style.transition = "top 0.5s cubic-bezier(.18,.89,.32,1.28), left 0.5s cubic-bezier(.18,.89,.32,1.28)";
         
         if(this.child !== null)
         {
@@ -290,6 +290,7 @@ class MouseContext extends Context
         if(this.initX + rect.width > window.innerWidth)
         {
             x = -200;
+            x += Math.min(window.innerWidth - this.initX + rect.width - 200 - 20, 0);
         }
         else
         {

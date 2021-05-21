@@ -1,51 +1,37 @@
-import Component from "../../../../map/component.js";
-import { Layout, Listener, Emitter } from "../../../../map/component.js";
+import ComponentBuilder from "../../../../map/component.js";
+import { Listener, Emitter } from "../../../../map/component.js";
 
-class UserInput extends Component
+class UserInput extends ComponentBuilder
 {
-    constructor(world, x, y, layout)
+    build(component)
     {
-        super(world, x, y, layout);
-        this.clicked = false;
+        component.width = 1;
+        component.height = 1;
+        component.addInteractor(Emitter, "output", 0, 0);
     }
 
-    getLayout()
-    {
-        return new Layout(1, 1, [Emitter.positioned("output", 0, 0)])
-    }
-
-    evaluate()
-    {
-        this.interactors.output.setState(this.clicked);
-        return true;
-    }
+    evaluate(component){}
 }
 
 class Switch extends UserInput
 {
-    static name = "Switch"
-
-    click()
+    click(component)
     {
-        this.clicked = !this.clicked;
-        this.invalidate();
+        component.interactors.output.setState(!component.interactors.output.state);
     }
 }
 
 class Button extends UserInput
 {
-    static name = "Button"
-
     constructor(world, x, y, layout)
     {
         super(world, x, y, layout);
         this.thread = null;
     }
 
-    click()
+    click(component)
     {
-        this.clicked = true;
-        this.invalidate();
+        component.interactors.output.setState(true);
 
         if(this.thread !== null)
         {
@@ -53,8 +39,7 @@ class Button extends UserInput
         }
 
         this.thread = setTimeout(()=>{
-            this.clicked = false;
-            this.invalidate();
+            component.interactors.output.setState(false);
         }, 100);
     }
 }
@@ -62,8 +47,8 @@ class Button extends UserInput
 
 function setup(app, container)
 {
-    app.component.registerComponent("builtin:switch", Switch);
-    app.component.registerComponent("builtin:button", Button);
+    app.component.registerComponent("builtin:switch", new Switch("Switch"));
+    app.component.registerComponent("builtin:button", new Button("Button"));
 }
 
 export {setup};
