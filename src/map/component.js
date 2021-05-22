@@ -31,6 +31,11 @@ class ComponentBuilder
         
     }
 
+    click(component)
+    {
+
+    }
+
     create(world, x, y)
     {
         return Component.from_builder(world, x, y, this);

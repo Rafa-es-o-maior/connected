@@ -289,6 +289,10 @@ class WorldMap extends Map
 
     checkSystems(...systems)
     {
+        if(systems.length == 0)
+        {
+            systems = this.systems;
+        }
         for(let system of systems)
         {
             if(system.bound_layers.size === 0)

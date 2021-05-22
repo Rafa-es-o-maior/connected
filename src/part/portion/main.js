@@ -106,7 +106,7 @@ function setup(app, container)
 
                             let layer = tile.layers[layeridx];
 
-                            layer.connections = tiledata.shift();
+                            layer.connections |= tiledata.shift();
                             let system_to_copy = systems.shift();
 
                             if(system_to_copy !== null)
