@@ -86,6 +86,30 @@ class Component
     {
         this.world.queuedComponents.add(this);
     }
+
+    clone()
+    {
+        let component = new Component(this.world, this.x, this.y);
+        
+        component.builder = this.builder;
+
+        component.rotation = this.rotation;
+        component.width = this.width;
+        component.height = this.height;
+
+        let entries = Object.entries(this.interactors);
+
+        for(let i = 0; i < entries.length; i++)
+        {
+            let interactor = entries[i][1];
+            let klass = interactor.constructor;
+            let copy = new klass(component, interactor.x, interactor.y);
+            copy.layer_idx = interactor.layer_idx;
+            component.interactors[entries[i][0]] = copy;
+        }
+
+        return component;
+    }
 }
 
 class Interactor

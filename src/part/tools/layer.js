@@ -6,7 +6,7 @@ function setup(app, container)
     {
         let ret = {};
 
-        let layer_count = app.world.loadedWorld.map.get(0, 0).layers.length;
+        let layer_count = app.world.loadedWorld.map.layers;
 
         for(let idx = 0; idx < layer_count; idx++)
         {
@@ -54,7 +54,7 @@ function setup(app, container)
 
 
             ret["add layer"] = addLayer;
-            if(app.world.loadedWorld.map.get(0, 0).layers.length > 1)
+            if(app.world.loadedWorld.map.layers > 1)
             {
                 ret["remove layer"] = layerSelector(removeLayer);
             }
@@ -64,7 +64,7 @@ function setup(app, container)
 
     app.keybinds.addCallback(["ArrowUp"], function()
     {
-        let layer_count = app.world.loadedWorld.map.get(0, 0).layers.length;
+        let layer_count = app.world.loadedWorld.map.layers;
         
         container.selected = Math.min(layer_count - 1, container.selected + 1);
         app.toast.addToast("layer selection++");

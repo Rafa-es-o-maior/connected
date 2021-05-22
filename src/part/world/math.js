@@ -17,10 +17,10 @@ function setup(app, container)
         let TL = container.screenToPosition(0, 0);
         let BR = container.screenToPosition(app.width + app.tilesize - 1, app.height + app.tilesize - 1);
 
-        bounds.top = TL.y;
-        bounds.left = TL.x;
-        bounds.right = BR.x;
-        bounds.bottom = BR.y;
+        bounds.top = Math.max(TL.y, 0);
+        bounds.left = Math.max(TL.x, 0);
+        bounds.right = Math.min(BR.x, app.world.loadedWorld.map.width);
+        bounds.bottom = Math.min(BR.y, app.world.loadedWorld.map.height);
 
         return bounds;
     }

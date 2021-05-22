@@ -27,9 +27,9 @@ function setup(app)
             pointing_shared_system = layer.getSharedSystem();
         }
 
-        for(let y = Math.max(bounds.top, 0); y < Math.min(bounds.bottom, app.world.loadedWorld.map.height); y++)
+        for(let y = bounds.top; y < bounds.bottom; y++)
         {
-            for(let x = Math.max(bounds.left, 0); x < Math.min(bounds.right, app.world.loadedWorld.map.width); x++)
+            for(let x = bounds.left; x < bounds.right; x++)
             {
                 let tile = app.world.loadedWorld.map.get(x, y);
 

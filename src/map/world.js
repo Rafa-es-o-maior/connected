@@ -139,13 +139,11 @@ class Map
 
 class WorldMap extends Map
 {
-    #systems
-
     constructor(world, width, height)
     {
         super(width, height);
         this.world = world;
-        this.#systems = new Set();
+        this.systems = new Set();
     }
 
     buildMap(width, height)
@@ -200,7 +198,7 @@ class WorldMap extends Map
             let new_system = new SharedSystem(this.world);
             console.log("created system");
 
-            this.#systems.add(new_system);
+            this.systems.add(new_system);
 
             let layer = this.get(path[0].x, path[0].y).layers[idx];
 
@@ -222,7 +220,7 @@ class WorldMap extends Map
             let layer = this.get(to_spread.x, to_spread.y).layers[idx];
             layer.spread();
 
-            this.#checkSystems(...to_check);
+            this.checkSystems(...to_check);
         }
     }
 
@@ -256,7 +254,7 @@ class WorldMap extends Map
                 }
 
                 layer.clearSharedSystem(); // we are sure by this time all connections have been removed, so clear the system
-                this.#checkSystems(system);
+                this.checkSystems(system);
             }
         }
 
@@ -278,24 +276,24 @@ class WorldMap extends Map
                     let system = new SharedSystem(this.world);
                     console.log("created system");
                     system.color = old_system.color;
-                    this.#systems.add(system);
+                    this.systems.add(system);
                     created_systems.push(system);
                     layer.setSharedSystem(system);
                     layer.spread();
 
-                    this.#checkSystems(old_system);
+                    this.checkSystems(old_system);
                 }
             }
         }
     }
 
-    #checkSystems(...systems)
+    checkSystems(...systems)
     {
         for(let system of systems)
         {
             if(system.bound_layers.size === 0)
             {
-                this.#systems.delete(system);
+                this.systems.delete(system);
                 console.log("erased system");
             }
         }
@@ -303,10 +301,15 @@ class WorldMap extends Map
 
     prepareRun()
     {
-        for(let system of this.#systems)
+        for(let system of this.systems)
         {
             system.prepareRun();
         }
+    }
+
+    get layers()
+    {
+        return this.get(0, 0).layers.length;
     }
 }
 

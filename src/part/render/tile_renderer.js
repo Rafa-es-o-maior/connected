@@ -8,9 +8,9 @@ function setup(app)
         app.ctx.strokeStyle = "#000000";
         app.ctx.fillStyle = "#aaaaaa";
 
-        for(let y = Math.max(bounds.top, 0); y < Math.min(bounds.bottom, app.world.loadedWorld.map.height); y++)
+        for(let y = bounds.top; y < bounds.bottom; y++)
         {
-            for(let x = Math.max(bounds.left, 0); x < Math.min(bounds.right, app.world.loadedWorld.map.width); x++)
+            for(let x = bounds.left; x < bounds.right; x++)
             {
                 let r = [app.pan.x + x * app.tilesize, app.pan.y + y * app.tilesize, app.tilesize, app.tilesize];
                 app.ctx.fillRect(...r);
