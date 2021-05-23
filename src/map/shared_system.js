@@ -6,7 +6,7 @@ class SharedSystem
     {
         this.world = world;
         this.bound_layers = new Set();
-        this.color = new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255);
+        this.color = new Color(Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255));
     }
 
     prepareRun()
@@ -80,7 +80,7 @@ class Color
             return fromHex(match.groups.red, match.groups.green, match.groups.blue);
         }
 
-        match = s.match(/^rgb\(\s*?(?<red>[0-9]{1,3})\s*?,\s*?(?<green>[0-9]{1,3})\s*?,\s*?(?<blue>[0-9]{1,3})\s*?\)$/);
+        match = s.match(/^rgb\(\s*?(?<red>[0-9]{1,3}(?:\.[0-9]*?)?)\s*?,\s*?(?<green>[0-9]{1,3}(?:\.[0-9]*?)?)\s*?,\s*?(?<blue>[0-9]{1,3}(?:\.[0-9]*?)?)\s*?\)$/);
 
         if(match !== null)
         {

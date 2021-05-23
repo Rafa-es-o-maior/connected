@@ -1,5 +1,6 @@
 import ComponentBuilder from "../../../../map/component.js";
 import { Listener, Emitter } from "../../../../map/component.js";
+import { World } from "../../../../map/world.js";
 
 class Component1Operation extends ComponentBuilder
 {
@@ -31,8 +32,8 @@ class BufferGate extends Component1Operation
 
 function setup(app, container)
 {
-    app.component.registerComponent("builtin:notgate", new NOTGate("NOT Gate"));
-    app.component.registerComponent("builtin:buffergate", new BufferGate("Buffer Gate"));
+    World.global_registry["builtin:notgate"] = new NOTGate("NOT Gate");
+    World.global_registry["builtin:buffergate"] = new BufferGate("Buffer Gate");
 }
 
 export {setup};

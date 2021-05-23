@@ -1,6 +1,6 @@
 import ComponentBuilder from "../../../../map/component.js";
 import { Listener, Emitter } from "../../../../map/component.js";
-
+import { World } from "../../../../map/world.js";
 class UserInput extends ComponentBuilder
 {
     build(component)
@@ -47,8 +47,8 @@ class Button extends UserInput
 
 function setup(app, container)
 {
-    app.component.registerComponent("builtin:switch", new Switch("Switch"));
-    app.component.registerComponent("builtin:button", new Button("Button"));
+    World.global_registry["builtin:switch"] = new Switch("Switch");
+    World.global_registry["builtin:button"] = new Button("Button");
 }
 
 export {setup};

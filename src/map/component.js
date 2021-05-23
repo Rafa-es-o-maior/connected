@@ -56,14 +56,14 @@ class Component
         this.height = 0;
 
         this.interactors = {};
-        this.builder = null;
+        this.registry_name = null;
     }
 
-    static from_builder(world, x, y, builder)
+    static from_builder(world, x, y, registry_name)
     {
         let component = new this(world, x, y);
-        component.builder = builder;
-        builder.build(component);
+        component.registry_name = registry_name;
+        component.builder.build(component);
         return component;
     }
 
@@ -77,6 +77,11 @@ class Component
         let pos = rotate(this.width, this.height, 0, 0, this.rotation);
 
         return {x: Math.abs(Math.round(pos.x)), y: Math.abs(Math.round(pos.y))};
+    }
+
+    get builder()
+    {
+        return this.world.registry[this.registry_name];
     }
 
     prepareRun()
@@ -184,7 +189,7 @@ class Listener extends Interactor
 
     get state()
     {
-        return this.system !== null && this.system.state;
+        return this.system !== null && this.system.oldstate;
     }
 }
 
@@ -231,4 +236,4 @@ const Rotation = {
 }
 
 export default ComponentBuilder;
-export {Rotation, Interactor, Listener, Emitter};
+export {Component, Rotation, Interactor, Listener, Emitter};

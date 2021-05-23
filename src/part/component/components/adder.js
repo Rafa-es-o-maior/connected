@@ -1,6 +1,6 @@
 import ComponentBuilder from "../../../../map/component.js";
 import { Listener, Emitter } from "../../../../map/component.js";
-
+import { World } from "../../../../map/world.js";
 class HalfAdder extends ComponentBuilder
 {
     build(component)
@@ -51,8 +51,8 @@ class FullAdder extends ComponentBuilder
 
 function setup(app, container)
 {
-    app.component.registerComponent("builtin:halfadder", new HalfAdder("Half Adder"));
-    app.component.registerComponent("builtin:fulladder", new FullAdder("Full Adder"));
+    World.global_registry["builtin:halfadder"] = new HalfAdder("Half Adder");
+    World.global_registry["builtin:fulladder"] = new FullAdder("Full Adder");
 }
 
 export {setup};

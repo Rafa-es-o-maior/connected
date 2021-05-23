@@ -1,16 +1,22 @@
 import Tile from "./tile.js";
 import { Side } from "./tilelayer.js";
 import SharedSystem from "./shared_system.js";
-
+import { Color } from "./shared_system.js";
+import ComponentBuilder, { Component, Emitter, Listener } from "./component.js";
 class World
 {
-    #running
+    #running;
+
+    static global_registry = {};
 
     constructor(width=10, height=10)
     {
         this.map = new WorldMap(this, width, height);
+
         this.components = new Set();
         this.#running = false;
+
+        this.local_registry = {};
     }
 
     get running()
@@ -68,6 +74,83 @@ class World
         }
 
         this.queuedSystems.clear()
+    }
+
+    serialize()
+    {
+        let map = this.map.serialize();
+        let components = [];
+
+        for(let component of this.components)
+        {
+            let interactors = {};
+
+            let entries = Object.entries(component.interactors);
+
+            for(let i = 0; i < entries.length; i++)
+            {
+                let interactor = entries[i][1];
+                interactors[entries[i][0]] = {
+                    x: interactor.x,
+                    y: interactor.y,
+                    layer: interactor.layer_idx,
+                    is_listener: interactor instanceof Listener
+                };
+            }
+
+            components.push({
+                x: component.x,
+                y: component.y,
+                width: component.width,
+                height: component.height,
+                interactors: interactors,
+                registry_name: component.registry_name
+            })
+        }
+
+        return {
+            map: map,
+            components
+        }
+    }
+
+    static unserialize(obj)
+    {
+        let world = new this(0, 0);
+
+        world.map = WorldMap.unserialize(world, obj.map);
+
+        for(let i = 0; i < obj.components.length; i++)
+        {
+            let reduced = obj.components[i];
+
+            let component = new Component(world, reduced.x, reduced.y);
+
+            component.registry_name = reduced.registry_name;
+
+            component.width = reduced.width;
+            component.height = reduced.height;
+
+            let entries = Object.entries(reduced.interactors);
+
+            for(let ii = 0; ii < entries.length; ii++)
+            {
+                let reduced_interactor = entries[ii][1];
+    
+                let interactor = new (reduced_interactor.is_listener? Listener : Emitter)(component, reduced_interactor.x, reduced_interactor.y);
+    
+                component.interactors[entries[ii][0]] = interactor;
+            }
+
+            world.components.add(component);
+        }
+
+        return world;
+    }
+
+    get registry()
+    {
+        return {...this.constructor.global_registry, ...this.local_registry};
     }
 }
 
@@ -314,6 +397,115 @@ class WorldMap extends Map
     get layers()
     {
         return this.get(0, 0).layers.length;
+    }
+
+    serialize()
+    {
+        let arr_systems = Array.from(this.systems);
+
+        let reduced_systems = arr_systems.map((item)=>item.color.toString());
+
+        let connections = "";
+        let system_spread = "";
+
+        for(let i = 0; i < this._arr.length; i++)
+        {
+            for(let layeridx = 0; layeridx < this.layers; layeridx++)
+            {
+                let storage_idx = i * this.layers + layeridx;
+                let layer = this._arr[i].layers[layeridx];
+
+                if(layer.connections > 0)
+                {
+                    if(connections.length > 0)
+                    {
+                        connections += "|";
+                    }
+                    connections += storage_idx.toString(36) + "|" + this._arr[i].layers[layeridx].connections;
+                }
+
+                let system = layer.getSharedSystem();
+
+                if(system !== null)
+                {
+                    let idx = arr_systems.findIndex((val)=>system === val);
+
+                    if(idx > -1)
+                    {
+                        if(system_spread.length > 0)
+                        {
+                            system_spread += "|";
+                        }
+
+                        system_spread += storage_idx.toString(36) + "|" + idx;
+                        arr_systems[idx] = null;
+                    }
+                }
+            }
+        }
+
+        return {
+            width: this.width,
+            height: this.height,
+            layers: this.layers,
+            systems: reduced_systems,
+            system_spread: system_spread,
+            connections: connections
+        }
+    }
+
+    static unserialize(world, obj)
+    {
+        let map = new this(world, obj.width, obj.height);
+
+        for(let i = 0; i < map._arr.length; i++)
+        {
+            let tile = map._arr[i];
+
+            for(let layeridx = 1; layeridx < obj.layers; layeridx++)
+            {
+                tile.createLayer();
+            }
+        }
+
+        let chunks = obj.connections.split("|");
+
+        while(chunks.length > 0)
+        {
+            let connections = parseInt(chunks.pop());
+            let raw_storage_idx = parseInt(chunks.pop(), 36);
+
+            let position = Math.floor(raw_storage_idx / map.layers);
+            let layer = raw_storage_idx % map.layers;
+
+            map._arr[position].layers[layer].connections = connections;
+        }
+
+        let unserialized_systems = [];
+
+        for(let i = 0; i < obj.systems.length; i++)
+        {
+            let new_system = new SharedSystem(world);
+            new_system.color = Color.from(obj.systems[i]);
+            map.systems.add(new_system);
+            unserialized_systems.push(new_system);
+        }
+
+        chunks = obj.system_spread.split("|");
+
+        while(chunks.length > 0)
+        {
+            let system_idx = parseInt(chunks.pop());
+            let raw_storage_idx = parseInt(chunks.pop(), 36);
+
+            let position = Math.floor(raw_storage_idx / map.layers);
+            let layer = raw_storage_idx % map.layers;
+
+            map._arr[position].layers[layer].setSharedSystem(unserialized_systems[system_idx]);
+            map._arr[position].layers[layer].spread();
+        }
+
+        return map;
     }
 }
 

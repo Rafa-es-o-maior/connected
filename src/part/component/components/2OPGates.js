@@ -1,5 +1,6 @@
 import ComponentBuilder from "../../../../map/component.js";
 import { Listener, Emitter } from "../../../../map/component.js";
+import { World } from "../../../../map/world.js";
 
 class Component2Operations extends ComponentBuilder
 {
@@ -63,11 +64,11 @@ class XNORGate extends Component2Operations
 
 function setup(app, container)
 {
-    app.component.registerComponent("builtin:andgate", new ANDGate("AND Gate"));
-    app.component.registerComponent("builtin:nandgate", new NANDGate("NAND Gate"));
-    app.component.registerComponent("builtin:orgate", new ORGate("OR Gate"));
-    app.component.registerComponent("builtin:norgate", new NORGate("NOR Gate"));
-    app.component.registerComponent("builtin:xorgate", new XORGate("XOR Gate"));
-    app.component.registerComponent("builtin:xnorgate", new XNORGate("XNOR Gate"));
+    World.global_registry["builtin:andgate"] = new ANDGate("AND Gate");
+    World.global_registry["builtin:nandgate"] = new NANDGate("NAND Gate");
+    World.global_registry["builtin:orgate"] = new ORGate("OR Gate");
+    World.global_registry["builtin:norgate"] = new NORGate("NOR Gate");
+    World.global_registry["builtin:xorgate"] = new XORGate("XOR Gate");
+    World.global_registry["builtin:xnorgate"] = new XNORGate("XNOR Gate");
 }
 export {setup};

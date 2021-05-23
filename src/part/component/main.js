@@ -1,21 +1,11 @@
+import { World } from "../../../../map/world.js";
+import { Component } from "../../../../map/component.js";
+
 function setup(app, container)
 {
-    let registry = [];
-
-    function setToolComponent(builder)
+    function setToolComponent(registry)
     {
-        app.tools.setPlacementTool(new app.component.tool.ComponentTool(app, builder.create(app.world.loadedWorld)))
-    }
-
-    container.registerComponent = function(name, builder)
-    {
-        registry[name] = builder;
-
-        app.context.mergeGlobalContext({
-            components: {
-                [builder.name]: setToolComponent.bind(null, builder)
-            }
-        })
+        app.tools.setPlacementTool(new app.component.tool.ComponentTool(app, Component.from_builder(app.world.loadedWorld, null, null, registry)))
     }
 
     container.getComponentByRegistryName = function(name)
@@ -157,6 +147,24 @@ function setup(app, container)
 
         ev.merge(root);
     }
+
+    app.context.mergeGlobalContext({
+        components: function()
+        {
+            let entries = Object.entries(app.world.loadedWorld.registry);
+            let ret = {};
+
+            for(let i = 0; i < entries.length; i++)
+            {
+                let registry_name = entries[i][0];
+                let builder = entries[i][1];
+                
+                ret[builder.name] = setToolComponent.bind(null, registry_name);
+            }
+
+            return ret;
+        }
+    })
 
     app.event.addEventListener("context", mergeContext);
 }

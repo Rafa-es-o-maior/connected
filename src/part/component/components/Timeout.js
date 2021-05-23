@@ -1,6 +1,6 @@
 import ComponentBuilder from "../../../../map/component.js";
 import { Listener, Emitter } from "../../../../map/component.js";
-
+import { World } from "../../../../map/world.js";
 class Timeout extends ComponentBuilder
 {
     build(component)
@@ -24,7 +24,7 @@ class Timeout extends ComponentBuilder
 
 function setup(app, container)
 {
-    app.component.registerComponent("builtin:timeoutgate", new Timeout("Timeout Gate"));
+    World.global_registry["builtin:timeoutgate"] = new Timeout("Timeout Gate");
 }
 
 export {setup};
