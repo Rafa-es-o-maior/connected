@@ -3,3 +3,208 @@
   "comments": false,
   "plugins": ["@babel/plugin-proposal-private-methods", "@babel/plugin-proposal-class-properties"]
 }
+\\ i think this is the better thing to you put on your program
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<style>
+/* Style the navbar */
+#navbar {
+  overflow: hidden;
+  background-color: #333;
+}
+
+/* Navbar links */
+#navbar a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px;
+  text-decoration: none;
+}
+
+/* Page content */
+.content {
+  padding: 16px;
+}
+
+/* The sticky class is added to the navbar with JS when it reaches its scroll position */
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+/* Add some top padding to the page content to prevent sudden quick movement (as the navigation bar gets a new position at the top of the page (position:fixed and top:0) */
+.sticky + .content {
+  padding-top: 60px;
+}
+table {
+   border: 1px solid black;
+   font-family:sans-serif;
+   max-width: 450px;
+  box-shadow: 10px 10px 5px #888;
+
+}
+#pont {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+
+}
+
+#pont td, #pont th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#pont tr:nth-child(even){background-color: white;}
+
+#pont tr:hover {background-color: #ddd;}
+
+#pont th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color:rgb(231,231,231);
+  color: black;
+  font-weight: normal;
+}
+body{margin:0;}
+</style>
+</head>
+<div id="grad">
+<div id="navbar">
+  <a href="Tabela_equipas.php" target="main_frame">Notícias</a>
+  <a href="form.php">Candidatura</a>
+  <a href="inserir_equipas.html">Inserir Equipas</a>
+  <a href="Tabela_equipas.php">Tabela das Equipas</a>
+</div>
+<div class="content">
+  <h1>NBA</h1>
+</div>
+<div>
+  <table align="center">
+    <tr>
+      <td>
+        <img src="clube\mvp.jpg" width="150px">
+      </td>
+      </tr>
+      <tr>
+      <td>
+        MVP Ano 2020
+      </td>
+    </tr>
+</table>
+<br>
+<br>
+<br>
+</div>
+<div>
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "pap";
+// Criar Ligação
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Verificar Ligação
+if ($conn->connect_error) {
+die("Falha na ligação: " . $conn->connect_error);
+}
+// Consulta à tabela
+$sql = "SELECT cod_equipa, nome_equipa, vitorias , pontos FROM equipas order by pontos desc limit 5";
+$result = mysqli_query($conn, $sql);
+// Verificação do resultado da consulta
+if (mysqli_num_rows($result) > 0) {
+    echo"<table style=\"margin-left:auto;margin-right:auto\"; id=\"pont\"
+    border=1><tr><th>Nome</th><th>Vitorias</th><th>Pontos</th></tr>";
+while($row=mysqli_fetch_assoc($result)) {
+    echo
+    "<tr><td>".$row["nome_equipa"]."</td><td>".$row["vitorias"]."</td><td>".$row["pontos"]."</td><tr>";
+}
+ echo "</table>";
+} else {
+echo "0 resultados";
+}
+// Fechar Ligação
+mysqli_close($conn);
+?>
+</div>
+<div>
+  <br>
+  <br>
+  <br>
+  <br>
+
+  <?php
+$servername="localhost";
+  $username="root";
+  $password="";
+  $dbname="pap";
+
+    // Criar Ligação
+    $conn=new mysqli($servername,$username,$password,$dbname);
+
+    //Verificar Ligação
+    if ($conn->connect_error) {
+      die("Falha na ligação: ".$conn->connect_eror);
+    }
+    $final=array();
+
+    $sql="SELECT cod_jogo,equipacasa,equipafora,data,nome_equipa FROM proxjogos inner join equipas on cod_equipa = equipacasa limit 2";
+    $sql2="SELECT cod_jogo,equipacasa,equipafora,data,nome_equipa FROM proxjogos inner join equipas on cod_equipa = equipafora limit 2" ;
+    $result=mysqli_query($conn,$sql); 
+    $result2=mysqli_query($conn,$sql2); 
+    if (mysqli_num_rows($result)>0) {
+      while($row=mysqli_fetch_assoc($result))
+      {
+
+      $final[$row["cod_jogo"]]=array("nome_casa" => $row["nome_equipa"],"data" => $row["data"]);
+      }
+      while($row=mysqli_fetch_assoc($result2))
+      {
+
+      $final[$row["cod_jogo"]]["nome_fora"] = $row["nome_equipa"];
+      }
+      echo "<table width=\"250px\" id=\"pont\" style=\"margin-left:auto;margin-right:auto\"; ><tr><th>Data</th><th>Equipa da Casa</th><th>Equipa de Fora</th></tr>";
+      foreach ($final as $key => $value)
+      {
+        echo "<tr>";
+        echo  "<td>" . $value["data"] . "</td>";
+        echo  "<td>" . $value["nome_casa"] . "</td>";
+        echo  "<td>" . $value["nome_fora"] . "</td>";
+        echo "</tr>";
+      }
+      echo "</table>";
+    }
+
+    // Fechar Ligação
+    mysqli_close($conn);
+
+    ?>
+
+
+
+</div>
+<script>
+window.onscroll = function() {myFunction()};
+
+var navbar = document.getElementById("navbar");
+var sticky = navbar.offsetTop;
+
+function myFunction() {
+  if (window.pageYOffset >= sticky) {
+    navbar.classList.add("sticky")
+  } else {
+    navbar.classList.remove("sticky");
+  }
+}
+</script>
+<body>
+  </div>
+</body>
+</html>
